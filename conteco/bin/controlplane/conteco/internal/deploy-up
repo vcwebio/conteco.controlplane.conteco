@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+rootPath=$1
+composefile=$2
+
+tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
+arguments="-c $tmpfile ${CONTECO_TYPE}_${CONTECO_NAME}"
+(
+	cat $composefile | envsubst > $tmpfile
+	cat $tmpfile
+)
+executionplane docker stack deploy $arguments
+rm $tmpfile

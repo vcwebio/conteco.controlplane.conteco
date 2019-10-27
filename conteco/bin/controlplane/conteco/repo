@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
+if [[ "$1" == "for-each-node" ]] ; then
 (
-    export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
-	. executionplane-invoke "$0 $@"
+	shift
+    . executionplane-invoke "$0 $@"
 	.base repo $@
-	executionplane-complete
+    executionplane-complete
 )
+else
+    export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+	selector=$(set-selector "${BASH_ARGV[0]}")
+	echo $selector
+	. check-selector-exists $selector "$1"
+	if [[ "$CONTECO_STATE" == "virtual" ]] ; then
+		$(basename $0) "for-each-node" ${@:1:$#-1} $selector
+	else
+		for-each $(basename $0) $@
+	fi
+fi
