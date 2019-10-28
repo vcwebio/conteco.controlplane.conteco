@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+deployPath=$1
+
+(
+tmpfile=$(mktemp /tmp/environment.template.XXXXXX)
+cp $deployPath/environment $tmpfile
+
+DOLLAR="$"
+environment_module=$'#!/usr/bin/env bash\n\n# START CONFIGURATION\n'
+environment_module="${environment_module}export CONTECO_DC_GLOBAL_STACKS='${CONTECO_DC_GLOBAL_STACKS}'
+export CONTECO_DC_GLOBAL_SERVICES='${CONTECO_DC_GLOBAL_SERVICES}'
+# END CONFIGURATION
+
+"
+
+sed -i "/# START CONFIGURATION/,/# END CONFIGURATION/d" $tmpfile
+sed -i "/# START GLOBAL SETTINGS/,/# END GLOBAL SETTINGS/d" $tmpfile
+sed -i "/# START TOPLEVEL SETTINGS/,/# END TOPLEVEL SETTINGS/d" $tmpfile
+
+environment_other=$(grep export $tmpfile | grep -v _PORTS | grep -v _DEPLOY | grep -v _NETWORKS | grep -v _VOLUMES)
+if [[ $environment_other != "" ]] ; then
+	environment_other="
+$environment_other"
+fi
+environment_module="${environment_module}# START OTHER VARIABLES$environment_other
+# END OTHER VARIABLES
+
+"
+
+environment_volumes=$(grep _VOLUMES $tmpfile | grep -v _GLOBAL)
+intermediate=$(grep _VOLUMES_ $tmpfile | cut -d'"' -f 2 | tr '\n' '|')
+intermediate="${intermediate//|/: \{ \}, }"
+intermediate=$(echo $intermediate | sed 's/.$//')
+if [[ $environment_volumes != "" ]] ; then
+	environment_volumes="
+$environment_volumes"
+	environment_module="${environment_module}# START VOLUMES VARIABLES$environment_volumes
+export CONTECO_DC_GLOBAL_VOLUMES=
+# END VOLUMES VARIABLES
+
+"
+else
+	environment_module="${environment_module}# START VOLUMES VARIABLES
+# END VOLUMES VARIABLES
+
+"
+fi
+
+environment_ports=$(grep _PORTS $tmpfile)
+if [[ $environment_ports != "" ]] ; then
+	environment_ports="
+$environment_ports"
+fi
+environment_module="${environment_module}# START PORTS VARIABLES$environment_ports
+# END PORTS VARIABLES
+
+"
+environment_networks=$(grep _NETWORKS $tmpfile | grep -v _GLOBAL)
+intermediate=$(grep _NETWORKS_ $tmpfile | cut -d'"' -f 2 | tr '\n' '|')
+intermediate="${intermediate//|/: \{ external: true \}, }"
+intermediate=$(echo $intermediate | sed 's/.$//')
+if [[ $environment_networks != "" ]] ; then
+	environment_networks="
+$environment_networks"
+	environment_module="${environment_module}# START NETWORKS VARIABLES$environment_networks
+export CONTECO_DC_GLOBAL_NETWORKS=
+# END NETWORKS VARIABLES
+
+"
+else
+	environment_module="${environment_module}# START NETWORKS VARIABLES
+# END NETWORKS VARIABLES
+
+"
+fi
+environment_deploy=$(grep _DEPLOY $tmpfile)
+if [[ $environment_deploy != "" ]] ; then
+	environment_deploy="
+$environment_deploy"
+fi
+environment_module="${environment_module}# START DEPLOY VARIABLES$environment_deploy
+# END DEPLOY VARIABLES
+
+"
+echo "$environment_module" > $deployPath/environment.module
+rm $tmpfile
+)

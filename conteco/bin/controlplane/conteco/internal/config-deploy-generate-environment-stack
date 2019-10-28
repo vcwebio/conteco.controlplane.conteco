@@ -3,11 +3,11 @@ deployPath=$1
 
 # generate environment file
 environment_file=$'#!/usr/bin/env bash\n\n'
-environmentEntry=$(sed -n "/# START STACK CONFIGURATION/,/# END STACK CONFIGURATION/p" $deployPath/environment)
+environmentEntry=$(sed -n "/# START CONFIGURATION/,/# END CONFIGURATION/p" $deployPath/environment)
 environment_file="${environment_file}${environmentEntry}
 
 "
-environmentEntry=$(sed -n "/# START GLOBAL SERVICE CONFIGURATION/,/# END GLOBAL SERVICE CONFIGURATION/p" $deployPath/environment)
+environmentEntry=$(sed -n "/# START GLOBAL SETTINGS/,/# END GLOBAL SETTINGS/p" $deployPath/environment)
 environment_file="${environment_file}${environmentEntry}
 "
 
@@ -30,7 +30,7 @@ environment_file="${environment_file}$(cat $tmpfile)
 "
 rm $tmpfile
 
-environmentEntry=$(sed -n "/# START GLOBAL VARIABLES/,/# END GLOBAL VARIABLES/p" $deployPath/environment)
+environmentEntry=$(sed -n "/# START TOPLEVEL SETTINGS/,/# END TOPLEVEL SETTINGS/p" $deployPath/environment)
 environment_file="${environment_file}${environmentEntry}
 "
 echo "$environment_file" > $deployPath/environment

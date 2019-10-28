@@ -16,7 +16,7 @@ if [[ "$1" == "for-each-node" ]] ; then
 	else
 		rootPath="${CONTECO_PWD}/$1"
 	fi
-	deployPath="$rootPath/conteco/assets/${CONTECO_TYPE}/${CONTECO_NAME}/deploy"
+	deployPath="$rootPath/conteco/docker-compose"
 	. $deployPath/environment
 	if [[ "$dockercompose" == *"docker-compose.yml" ]] ; then
 		dockercompose="$deployPath/$dockercompose"
