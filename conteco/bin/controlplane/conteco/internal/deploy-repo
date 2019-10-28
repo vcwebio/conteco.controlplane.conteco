@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+deployPath=$1
+
+(
+	defaultPath="${CONTECO_PWD}/${CONTECO_REALM}/conteco.controlplane.conteco/conteco/assets/modeco"
+	executionplane-info "DEFAULT     REPO: $defaultPath"
+
+	rootPath=$1
+	executionplane-info "SOURCE      REPO: $rootPath"
+
+	if [[ " stack module " == *"$CONTECO_TYPE"* ]] ; then
+		export MODECO_TYPE="${CONTECO_NAME}"
+	else
+		export MODECO_TYPE="${CONTECO_TYPE}_${CONTECO_NAME}"
+	fi
+	modecoPath="${CONTECO_PWD}/${CONTECO_REALM}/modeco.${MODECO_TYPE}.base"
+	executionplane-info "DESTINATION REPO: $modecoPath"
+	
+	if [[ ! -d $modecoPath ]] ; then
+		mkdir $modecoPath
+		executionplane-info "Repository root $modecoPath created."
+	else
+		executionplane-info "Repository root $modecoPath exists."
+	fi
+	if [[ ! -f $modecoPath/LICENSE ]] ; then
+		cp $defaultPath/LICENSE $modecoPath/LICENSE
+		executionplane-info "Copied LICENSE"
+	fi
+	if [[ ! -f $modecoPath/Dockerfile ]] ; then
+		cp $defaultPath/Dockerfile $modecoPath/Dockerfile
+		executionplane-info "Copied Dockerfile"
+	fi
+	if [[ ! -f $modecoPath/README.md ]] ; then
+		(cat $defaultPath/README.md | envsubst) > $modecoPath/README.md
+		executionplane-info "Created README"
+	fi
+	if [[ ! -f $modecoPath/environment ]] ; then
+		(cat $defaultPath/environment | envsubst) > $modecoPath/environment
+		executionplane-info "Created environment"
+	fi
+	mkdir -p $modecoPath/modeco/stacks
+	if [[ -f $rootPath/conteco/docker-compose/docker-compose.yml ]] ; then
+		cp $rootPath/conteco/docker-compose/docker-compose.yml $modecoPath/modeco/stacks/${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml
+		executionplane-info "Copied docker-compose.yml to ${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml"
+	else
+		cp $rootPath/conteco/docker-compose/*.docker-compose.yml $modecoPath/modeco/stacks/
+		executionplane-info "Copied docker-compose.yml for module stacks"
+	fi
+	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/base.settings
+	executionplane-info "Copied environment.module to base.settings"
+	if [[ ! -f $modecoPath/modeco/settings ]] ; then
+		cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings
+		executionplane-info "Copied environment.module to settings"
+	fi
+)

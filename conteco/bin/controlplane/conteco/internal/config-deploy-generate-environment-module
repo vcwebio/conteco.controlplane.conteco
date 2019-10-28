@@ -6,9 +6,13 @@ tmpfile=$(mktemp /tmp/environment.template.XXXXXX)
 cp $deployPath/environment $tmpfile
 
 DOLLAR="$"
+if [[ "$CONTECO_TYPE" == "module" ]] ; then
+	moduleStacks="$CONTECO_DC_GLOBAL_STACKS"
+else
+	moduleStacks="'$CONTECO_TYPE.$CONTECO_NAME'"
+fi
 environment_module=$'#!/usr/bin/env bash\n\n# START CONFIGURATION\n'
-environment_module="${environment_module}export CONTECO_DC_GLOBAL_STACKS='${CONTECO_DC_GLOBAL_STACKS}'
-export CONTECO_DC_GLOBAL_SERVICES='${CONTECO_DC_GLOBAL_SERVICES}'
+environment_module="${environment_module}export CONTECO_DC_GLOBAL_STACKS='$moduleStacks'
 # END CONFIGURATION
 
 "
@@ -28,14 +32,14 @@ environment_module="${environment_module}# START OTHER VARIABLES$environment_oth
 "
 
 environment_volumes=$(grep _VOLUMES $tmpfile | grep -v _GLOBAL)
-intermediate=$(grep _VOLUMES_ $tmpfile | cut -d'"' -f 2 | tr '\n' '|')
+intermediate=$(grep _VOLUMES_ $tmpfile | grep -v _GLOBAL | cut -d'"' -f 2 | tr '\n' '|')
 intermediate="${intermediate//|/: \{ \}, }"
 intermediate=$(echo $intermediate | sed 's/.$//')
 if [[ $environment_volumes != "" ]] ; then
 	environment_volumes="
 $environment_volumes"
 	environment_module="${environment_module}# START VOLUMES VARIABLES$environment_volumes
-export CONTECO_DC_GLOBAL_VOLUMES=
+export CONTECO_DC_GLOBAL_VOLUMES=\"$intermediate\"
 # END VOLUMES VARIABLES
 
 "
@@ -56,14 +60,11 @@ environment_module="${environment_module}# START PORTS VARIABLES$environment_por
 
 "
 environment_networks=$(grep _NETWORKS $tmpfile | grep -v _GLOBAL)
-intermediate=$(grep _NETWORKS_ $tmpfile | cut -d'"' -f 2 | tr '\n' '|')
-intermediate="${intermediate//|/: \{ external: true \}, }"
-intermediate=$(echo $intermediate | sed 's/.$//')
 if [[ $environment_networks != "" ]] ; then
 	environment_networks="
 $environment_networks"
 	environment_module="${environment_module}# START NETWORKS VARIABLES$environment_networks
-export CONTECO_DC_GLOBAL_NETWORKS=
+export CONTECO_DC_GLOBAL_NETWORKS=${CONTECO_ECOSYSTEM}_overlay: { external: true }
 # END NETWORKS VARIABLES
 
 "

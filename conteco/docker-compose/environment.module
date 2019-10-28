@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 # START CONFIGURATION
-export CONTECO_DC_GLOBAL_STACKS=''
-export CONTECO_DC_GLOBAL_SERVICES='controlplane.conteco'
+export CONTECO_DC_GLOBAL_STACKS=''controlplane.conteco''
 # END CONFIGURATION
 
 # START OTHER VARIABLES

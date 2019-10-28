@@ -28,10 +28,19 @@ do
 environment_file="${environment_file}$(cat $tmpfile)
 
 "
-rm $tmpfile
 
-environmentEntry=$(sed -n "/# START TOPLEVEL SETTINGS/,/# END TOPLEVEL SETTINGS/p" $deployPath/environment)
-environment_file="${environment_file}${environmentEntry}
+#environmentEntry=$(sed -n "/# START TOPLEVEL SETTINGS/,/# END TOPLEVEL SETTINGS/p" $deployPath/environment)
+#environment_file="${environment_file}${environmentEntry}
+#"
+
+intermediate=$(grep _VOLUMES_ $tmpfile | grep -v _GLOBAL | cut -d'"' -f 2 | tr '\n' '|')
+intermediate="${intermediate//|/: \{ \}, }"
+intermediate=$(echo $intermediate | sed 's/.$//')
+environment_file="${environment_file}# START TOPLEVEL SETTINGS
+export CONTECO_DC_GLOBAL_VOLUMES=\"$intermediate\"
+export CONTECO_DC_GLOBAL_NETWORKS=\"${CONTECO_ECOSYSTEM}_overlay: { external: true }\"
+# END TOPLEVEL SETTINGS
 "
+rm $tmpfile
 echo "$environment_file" > $deployPath/environment
 		

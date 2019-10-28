@@ -24,27 +24,34 @@ if [[ "$1" == "for-each-node" ]] ; then
 		dockercompose="$deployPath/docker-compose.yml"
 	fi
 
-	if [[ -f $dockercompose ]] ; then
+	case $command in
+		repo)
+			deploy-repo $rootPath
+			;;
+		*)
+			if [[ -f $dockercompose ]] ; then
 
-		if [[ "$command" == "down" ]] ; then
-			executionplane docker stack remove  "${CONTECO_TYPE}_${CONTECO_NAME}"
-		elif [[ "$command" == "downup" ]] ; then
-			executionplane docker stack remove  "${CONTECO_TYPE}_${CONTECO_NAME}"
-			deploy-up $rootPath $dockercompose
-		elif [[ "$command" == "up" ]] ; then
-			deploy-up $rootPath $dockercompose
-		fi
+				if [[ "$command" == "down" ]] ; then
+					executionplane docker stack remove  "${CONTECO_TYPE}_${CONTECO_NAME}"
+				elif [[ "$command" == "downup" ]] ; then
+					executionplane docker stack remove  "${CONTECO_TYPE}_${CONTECO_NAME}"
+					deploy-up $rootPath $dockercompose
+				elif [[ "$command" == "up" ]] ; then
+					deploy-up $rootPath $dockercompose
+				fi
 
-	else
+			else
 
-		moduleStacks="${CONTECO_DC_GLOBAL_STACKS}"
-		IFS=',' read -r -a stacks <<< "$moduleStacks"
-		for stack in ${stacks[@]};
-		do
-			deploy $command "$stack.docker-compose.yml" $@
-			done;
+				moduleStacks="${CONTECO_DC_GLOBAL_STACKS}"
+				IFS=',' read -r -a stacks <<< "$moduleStacks"
+				for stack in ${stacks[@]};
+				do
+					deploy $command "$stack.docker-compose.yml" $@
+					done;
 
- 	fi
+			fi
+			;;
+	esac
 	executionplane-complete
 )
 else
