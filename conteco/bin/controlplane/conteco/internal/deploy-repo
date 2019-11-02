@@ -56,4 +56,8 @@ deployPath=$1
 		echo $'#!/usr/bin/env bash\n\n# START MODULE SETTINGS\n# END MODULE SETTINGS\n\n# START GLOBAL SETTINGS\n# END GLOBAL SETTINGS\n' > $modecoPath/modeco/settings.global
 		executionplane-info "Created settings.global"
 	fi
+	if [[ ! -f $modecoPath/modeco/settings ]] ; then
+		cp $modecoPath/modeco/settings.template $modecoPath/modeco/settings
+		executionplane-info "Created settings"
+	fi
 )
