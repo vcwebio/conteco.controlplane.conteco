@@ -40,16 +40,20 @@ deployPath=$1
 	fi
 	mkdir -p $modecoPath/modeco/stacks
 	if [[ -f $rootPath/conteco/docker-compose/docker-compose.yml ]] ; then
-		cp $rootPath/conteco/docker-compose/docker-compose.yml $modecoPath/modeco/stacks/${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml
-		executionplane-info "Copied docker-compose.yml to ${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml"
+		cp $rootPath/conteco/docker-compose/docker-compose.yml $modecoPath/modeco/stacks/${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
+		executionplane-info "Copied docker-compose.yml to ${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template"
 	else
-		cp $rootPath/conteco/docker-compose/*.docker-compose.yml $modecoPath/modeco/stacks/
-		executionplane-info "Copied docker-compose.yml for module stacks"
+		for f in $rootPath/conteco/docker-compose/*.docker-compose.yml;
+		do
+			filename=$(basename $f)
+			cp $f $modecoPath/modeco/stacks/${filename}.template
+			executionplane-info "Copied $filename to ${filename}.template"
+			done;
 	fi
-	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/base.settings
-	executionplane-info "Copied environment.module to base.settings"
-	if [[ ! -f $modecoPath/modeco/settings ]] ; then
-		cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings
-		executionplane-info "Copied environment.module to settings"
+	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings.template
+	executionplane-info "Copied environment.module to settings.template"
+	if [[ ! -f $modecoPath/modeco/settings.global ]] ; then
+		echo $'#!/usr/bin/env bash\n\n# START MODULE SETTINGS\n# END MODULE SETTINGS\n\n# START GLOBAL SETTINGS\n# END GLOBAL SETTINGS\n' > $modecoPath/modeco/settings.global
+		executionplane-info "Created settings.global"
 	fi
 )
