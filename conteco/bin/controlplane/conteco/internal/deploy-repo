@@ -40,13 +40,14 @@ deployPath=$1
 	fi
 	mkdir -p $modecoPath/modeco/stacks
 	if [[ -f $rootPath/conteco/docker-compose/docker-compose.yml ]] ; then
-		cp $rootPath/conteco/docker-compose/docker-compose.yml $modecoPath/modeco/stacks/${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
+		cat $rootPath/conteco/docker-compose/docker-compose.yml | envsubst '$CONTECO_REGISTRY,$CONTECO_REALM,$CONTECO_ECOSYSTEM' \
+			> $modecoPath/modeco/stacks/${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
 		executionplane-info "Copied docker-compose.yml to ${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template"
 	else
 		for f in $rootPath/conteco/docker-compose/*.docker-compose.yml;
 		do
 			filename=$(basename $f)
-			cp $f $modecoPath/modeco/stacks/${filename}.template
+			cat $f | envsubst '$CONTECO_REGISTRY,$CONTECO_REALM,$CONTECO_ECOSYSTEM' > $modecoPath/modeco/stacks/${filename}.template
 			executionplane-info "Copied $filename to ${filename}.template"
 			done;
 	fi
