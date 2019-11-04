@@ -22,5 +22,5 @@ docker_compose_template="${docker_compose_template}networks: {${DOLLAR}{CONTECO_
 volumes: {${DOLLAR}{CONTECO_DC_GLOBAL_VOLUMES}}
 "
 echo "$environment_template" > $deployPath/environment.template
-echo "$docker_compose_template" > $deployPath/docker-compose.yml
+echo "$docker_compose_template" > $deployPath/docker-compose.yml.template
 )
