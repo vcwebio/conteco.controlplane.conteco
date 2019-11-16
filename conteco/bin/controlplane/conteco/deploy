@@ -2,7 +2,7 @@
 if [[ "$1" == "for-each-node" ]] ; then
 (
 	shift
-    . executionplane-invoke "$0 $@"
+  . executionplane-invoke "$0 $@"
 	imageName="${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.${CONTECO_TYPE}.${CONTECO_NAME}"
 	if [[ $# -gt 1 ]] ; then
 		command=$1
@@ -26,7 +26,7 @@ if [[ "$1" == "for-each-node" ]] ; then
 	fi
 	if [[ "$CONTECO_TYPE" == "module" ]] ; then
 		stackName="${CONTECO_TYPE}_${CONTECO_NAME}_$stackNumber"
-	else 
+	else
 		stackName="${CONTECO_TYPE}_${CONTECO_NAME}"
 	fi
 	case $command in
@@ -35,7 +35,6 @@ if [[ "$1" == "for-each-node" ]] ; then
 			;;
 		*)
 			if [[ -f $dockercompose ]] ; then
-
 				if [[ "$command" == "down" ]] ; then
 					executionplane docker stack remove  "$stackName"
 				elif [[ "$command" == "downup" ]] ; then
@@ -44,9 +43,7 @@ if [[ "$1" == "for-each-node" ]] ; then
 				elif [[ "$command" == "up" ]] ; then
 					deploy-up $stackName $dockercompose
 				fi
-
 			else
-
 				moduleStacks="${CONTECO_DC_GLOBAL_STACKS}"
 				IFS=',' read -r -a stacks <<< "$moduleStacks"
 				for stackNumber in ${!stacks[@]};
@@ -54,13 +51,12 @@ if [[ "$1" == "for-each-node" ]] ; then
 					stack=${stacks[stackNumber]}
 					deploy $command "$stackNumber.$stack.docker-compose.yml" $stackNumber $@
 					done;
-
 			fi
 			;;
 	esac
 	executionplane-complete
 )
 else
-    export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+  export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
 	for-each $(basename $0) $@
 fi

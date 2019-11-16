@@ -1,0 +1,7 @@
+#
+# controlplane.conteco
+# The conteco controlplane manages the images creating structural container ecosystems.
+# The output are base modeco repository which are then used to create functional modules.
+#
+# Its API implements repo, console, build, release and deploy.
+#
