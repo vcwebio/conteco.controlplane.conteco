@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+deployPath=$1
+(
+IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKS}"
+for stackNumber in ${!stacks[@]};
+do
+	stack=${stacks[stackNumber]}
+	destination="$deployPath/$stackNumber.$stack.docker-compose.yml"
+	source="$destination.template"
+	cat $source | envsubst '$CONTECO_TYPE,$CONTECO_NAME' | envsubst "$CONTECO_DC_GLOBAL" > $destination
+	done;
+)
