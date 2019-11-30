@@ -4,10 +4,8 @@ deployPath=$1
 (
 	defaultPath="${CONTECO_PWD}/${CONTECO_REALM}/conteco.controlplane.conteco/conteco/assets/modeco"
 	executionplane-info "DEFAULT     REPO: $defaultPath"
-
 	rootPath=$1
 	executionplane-info "SOURCE      REPO: $rootPath"
-
 	if [[ " stack module " == *"$CONTECO_TYPE"* ]] ; then
 		export MODECO_TYPE="${CONTECO_NAME}"
 	else
@@ -19,25 +17,28 @@ deployPath=$1
 	if [[ ! -d $modecoPath ]] ; then
 		mkdir $modecoPath
 		executionplane-info "Repository root $modecoPath created."
-	else
-		executionplane-info "Repository root $modecoPath exists."
-	fi
-	if [[ ! -f $modecoPath/LICENSE ]] ; then
-		cp $defaultPath/LICENSE $modecoPath/LICENSE
-		executionplane-info "Copied LICENSE"
-	fi
-	if [[ ! -f $modecoPath/Dockerfile ]] ; then
-		cp $defaultPath/Dockerfile $modecoPath/Dockerfile
-		executionplane-info "Copied Dockerfile"
-	fi
-	if [[ ! -f $modecoPath/README.md ]] ; then
-		(cat $defaultPath/README.md | envsubst) > $modecoPath/README.md
-		executionplane-info "Created README"
-	fi
-	if [[ ! -f $modecoPath/environment ]] ; then
+		cp -rf $defaultPath/* $modecoPath
+		executionplane-info "Copied default repository assets to $modecoPath."
 		(cat $defaultPath/environment | envsubst) > $modecoPath/environment
-		executionplane-info "Created environment"
+		executionplane-info "Created module environment"
+		(
+			current=$(pwd)
+			cd $modecoPath
+			executionplane git init
+			cd $current
+		)
+		executionplane-info "Initialised repository."
+	else
+		executionplane-info "Repository already exists at $modecoPath."
+		# update How To help section
+		for f in $defaultPath/docs/HOW-TO*
+		do
+			cat $f | envsubst > $modecoPath/docs/$(basename $f)
+			done;
+		executionplane-info "Update How To help section."
 	fi
+
+	# copy stack docker-compose.yml files
 	mkdir -p $modecoPath/modeco/stacks
 	if [[ -f $rootPath/conteco/docker-compose/docker-compose.yml ]] ; then
 		cat $rootPath/conteco/docker-compose/docker-compose.yml | envsubst '$CONTECO_REGISTRY,$CONTECO_REALM,$CONTECO_ECOSYSTEM' \
@@ -51,11 +52,8 @@ deployPath=$1
 			executionplane-info "Copied $filename to ${filename}.template"
 			done;
 	fi
+
+	# create / update settings.template
 	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings.template
 	executionplane-info "Copied environment.module to settings.template"
-	if [[ ! -f $modecoPath/modeco/settings ]] ; then
-		echo $'#!/usr/bin/env bash\n\n# START MODULE SETTINGS\n# END MODULE SETTINGS\n\n# START GLOBAL SETTINGS\n# END GLOBAL SETTINGS\n\n' > $modecoPath/modeco/settings
-		echo $modecoPath/modeco/settings.template >> $modecoPath/modeco/settings
-		executionplane-info "Created settings"
-	fi
 )
