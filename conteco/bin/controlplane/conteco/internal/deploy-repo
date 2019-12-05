@@ -8,12 +8,14 @@ deployPath=$1
 	executionplane-info "SOURCE      REPO: $rootPath"
 	if [[ " stack module " == *"$CONTECO_TYPE"* ]] ; then
 		export MODECO_TYPE="${CONTECO_NAME}"
+	elif [[ "$CONTECO_NAME" == "base" ]] ; then
+		export MODECO_TYPE="${CONTECO_TYPE}"
 	else
 		export MODECO_TYPE="${CONTECO_TYPE}_${CONTECO_NAME}"
 	fi
 	modecoPath="${CONTECO_PWD}/${CONTECO_REALM}/modeco.${MODECO_TYPE}.base"
 	executionplane-info "DESTINATION REPO: $modecoPath"
-	
+
 	if [[ ! -d $modecoPath ]] ; then
 		mkdir $modecoPath
 		executionplane-info "Repository root $modecoPath created."
