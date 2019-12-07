@@ -44,18 +44,21 @@ deployPath=$1
 	mkdir -p $modecoPath/modeco/stacks
 	if [[ -f $rootPath/conteco/docker-compose/docker-compose.yml ]] ; then
 		cat $rootPath/conteco/docker-compose/docker-compose.yml | envsubst '$CONTECO_REGISTRY,$CONTECO_REALM,$CONTECO_ECOSYSTEM' \
-			> $modecoPath/modeco/stacks/${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
-		executionplane-info "Copied docker-compose.yml to ${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template"
+			> $modecoPath/modeco/stacks/0.${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
+		sed -i -e "s/conteco_overlay/modeco_overlay/g" $modecoPath/modeco/stacks/0.${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
+		executionplane-info "Copied docker-compose.yml to 0.${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template"
 	else
 		for f in $rootPath/conteco/docker-compose/*.docker-compose.yml;
 		do
 			filename=$(basename $f)
 			cat $f | envsubst '$CONTECO_REGISTRY,$CONTECO_REALM,$CONTECO_ECOSYSTEM' > $modecoPath/modeco/stacks/${filename}.template
+			sed -i -e "s/conteco_overlay/modeco_overlay/g" $modecoPath/modeco/stacks/${filename}.template
 			executionplane-info "Copied $filename to ${filename}.template"
 			done;
 	fi
 
 	# create / update settings.template
 	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings.template
+	sed -i -e "s/conteco_overlay/modeco_overlay/g" $modecoPath/modeco/settings.template
 	executionplane-info "Copied environment.module to settings.template"
 )
