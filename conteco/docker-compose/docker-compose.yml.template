@@ -5,15 +5,16 @@ services:
 # START SERVICE $CONTECO_TYPE.$CONTECO_NAME
   ${CONTECO_DC_GLOBAL_SERVICE_NAME}:
     image: ${CONTECO_REGISTRY}${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.${CONTECO_DC_GLOBAL_IMAGE_NAME}
-    environment: [${CONTECO_DC_SERVICE_ENVIRONMENT}] 
+    environment: [${CONTECO_DC_SERVICE_ENVIRONMENT}]
     command: [${CONTECO_DC_SERVICE_COMMAND}]
     volumes: [${CONTECO_DC_SERVICE_VOLUMES}]
     ports: [${CONTECO_DC_SERVICE_PORTS}]
     networks: [${CONTECO_DC_SERVICE_NETWORKS}]
+    labels: [${CONTECO_DC_SERVICE_LABELS}]
     deploy:
       mode: ${CONTECO_DC_SERVICE_DEPLOY_MODE}
-      resources: 
-        limits: 
+      resources:
+        limits:
           cpus: '${CONTECO_DC_SERVICE_DEPLOY_RESOURCES_LIMITS_CPUS}'
           memory: '${CONTECO_DC_SERVICE_DEPLOY_RESOURCES_LIMITS_MEMORY}'
         reservations:
