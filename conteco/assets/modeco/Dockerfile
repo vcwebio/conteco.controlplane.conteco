@@ -1,5 +1,5 @@
 ##### BEGIN modeco.base/Dockerfile/image-header #####
-FROM $CONTECO_REGISTRY$CONTECO_REALM/$CONTECO_ECOSYSTEM.$CONTECO_BASE AS base
+FROM $CONTECO_REGISTRY$CONTECO_REALM/conteco.$CONTECO_BASE AS base
 ##### END modeco.base/Dockerfile/image-header #####
 
 ##### BEGIN modeco.base/Dockerfile/conteco #####
@@ -29,5 +29,5 @@ LABEL $CONTECO_LABELSPACE.schema-version="1.0" \
       $CONTECO_LABELSPACE.build="$CONTECO_BUILD" \
       $CONTECO_LABELSPACE.label="$CONTECO_LABEL" \
       $CONTECO_LABELSPACE.description="$CONTECO_DESCRIPTION" \
-      $CONTECO_LABELSPACE.docker.cmd.help="docker run ${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.${CONTECO_TYPE}.${CONTECO_NAME} --help" 
+      $CONTECO_LABELSPACE.docker.cmd.help="docker run ${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.${CONTECO_TYPE}.${CONTECO_NAME} --help"
 ##### END modeco.base/Dockerfile/env-labels-footer #####

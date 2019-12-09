@@ -7,6 +7,6 @@ do
 	stack=${stacks[stackNumber]}
 	destination="$deployPath/$stackNumber.$stack.docker-compose.yml"
 	source="$destination.template"
-	cat $source | envsubst '$CONTECO_TYPE,$CONTECO_NAME' | envsubst "$CONTECO_DC_GLOBAL" > $destination
+	cat $source | envsubst "$CONTECO_DC_GLOBAL" > $destination
 	done;
 )

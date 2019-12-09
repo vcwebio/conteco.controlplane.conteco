@@ -20,10 +20,10 @@ Run:
 
 ```bash
 # linux
-docker run -v $(pwd):/conteco/pwd vcwebio/conteco.controlplane.modeco --interactive boot-commandline
+docker run -v $(pwd):/conteco/pwd vcwebio/conteco.controlplane.modeco --interactive boot-commandline linux # optional: sudo
 
 # Windows
-docker run -v %cd%:/conteco/pwd vcwebio/conteco.controlplane.modeco --interactive boot-commandline
+docker run -v %cd%:/conteco/pwd vcwebio/conteco.controlplane.modeco --interactive boot-commandline windows
 ```
 
 ![boot-commandline](./boot-commandline.PNG "boot-commandline")
