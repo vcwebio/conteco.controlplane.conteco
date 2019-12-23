@@ -10,7 +10,6 @@ services:
     volumes: [${CONTECO_DC_SERVICE_VOLUMES}]
     ports: [${CONTECO_DC_SERVICE_PORTS}]
     networks: [${CONTECO_DC_SERVICE_NETWORKS}]
-    labels: [${CONTECO_DC_SERVICE_LABELS}]
     deploy:
       mode: ${CONTECO_DC_SERVICE_DEPLOY_MODE}
       resources:

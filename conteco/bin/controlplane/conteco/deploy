@@ -37,10 +37,12 @@ if [[ "$1" == "for-each-node" ]] ; then
 			if [[ -f $dockercompose ]] ; then
 				if [[ "$command" == "down" ]] ; then
 					executionplane docker stack remove  "$stackName"
+					executionplane docker network rm  "${CONTECO_TYPE}_overlay"
 				elif [[ "$command" == "downup" ]] ; then
 					executionplane docker stack remove  "$stackName"
 					deploy-up $stackName $dockercompose
 				elif [[ "$command" == "up" ]] ; then
+					executionplane docker network create -d overlay  "${CONTECO_TYPE}_overlay"
 					deploy-up $stackName $dockercompose
 				fi
 			else
