@@ -6,13 +6,10 @@ tmpfile=$(mktemp /tmp/environment.template.XXXXXX)
 cp $deployPath/environment $tmpfile
 
 DOLLAR="$"
-if [[ "$CONTECO_TYPE" == "module" ]] ; then
-	moduleStacks="$CONTECO_DC_GLOBAL_STACKS"
-else
-	moduleStacks="'$CONTECO_TYPE.$CONTECO_NAME'"
-fi
 environment_module=$'#!/usr/bin/env bash\n\n# START CONFIGURATION\n'
-environment_module="${environment_module}export CONTECO_DC_GLOBAL_STACKS='$moduleStacks'
+environment_module="${environment_module}export CONTECO_DC_GLOBAL_STACKS='$CONTECO_DC_GLOBAL_STACKS'
+export CONTECO_DC_GLOBAL_STACKNAMES='$CONTECO_DC_GLOBAL_STACKNAMES'
+export CONTECO_DC_GLOBAL_VOLUME_LIST='$CONTECO_DC_GLOBAL_VOLUME_LIST'
 # END CONFIGURATION
 
 "

@@ -4,16 +4,16 @@ deployPath=$1
 (
 environment_template=$'#!/usr/bin/env bash\n\n'
 docker_compose_template=$'---\nversion: \'3\'\nservices:\n\n'
-IFS=',' read -r -a services <<< "${CONTECO_DC_GLOBAL_SERVICES}"
-for service in ${services[@]};
+IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKS}"
+for stack in ${stacks[@]};
 do
-	servicePath="${CONTECO_PWD}/${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.$service/conteco/docker-compose"
-	serviceEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $servicePath/environment)
-	environment_template="${environment_template}${serviceEnvironment}
+	stackPath="${CONTECO_PWD}/${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.$stack/conteco/docker-compose"
+	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $stackPath/environment)
+	environment_template="${environment_template}${stackEnvironment}
 
 "
-	serviceDockerCompose=$(sed -n "/# START SERVICE/,/# END SERVICE/p" $servicePath/docker-compose.yml)
-	docker_compose_template="${docker_compose_template}${serviceDockerCompose}
+	stackDockerCompose=$(sed -n "/# START SERVICE/,/# END SERVICE/p" $stackPath/docker-compose.yml)
+	docker_compose_template="${docker_compose_template}${stackDockerCompose}
 
 "
 	done;

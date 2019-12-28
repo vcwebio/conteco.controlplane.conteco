@@ -2,18 +2,16 @@
 deployPath=$1
 
 (
-	defaultPath="${CONTECO_PWD}/${CONTECO_REALM}/conteco.controlplane.conteco/conteco/assets/modeco"
+	defaultPath="${CONTECO_PWD}/${CONTECO_REALM}/modeco.base.base"
+	if [[ ! -d $defaultPath ]] ; then
+		echo "Base Module Template Not Available!: $defaultPath"
+		exit 1
+	fi
 	executionplane-info "DEFAULT     REPO: $defaultPath"
 	rootPath=$1
 	executionplane-info "SOURCE      REPO: $rootPath"
-	if [[ " stack module " == *"$CONTECO_TYPE"* ]] ; then
-		export MODECO_TYPE="${CONTECO_NAME}"
-	elif [[ "$CONTECO_NAME" == "base" ]] ; then
-		export MODECO_TYPE="${CONTECO_TYPE}"
-	else
-		export MODECO_TYPE="${CONTECO_TYPE}_${CONTECO_NAME}"
-	fi
-	modecoPath="${CONTECO_PWD}/${CONTECO_REALM}/modeco.${MODECO_TYPE}.base"
+	export MODECO_NAME="${CONTECO_TYPE}_${CONTECO_NAME}"
+	modecoPath="${CONTECO_PWD}/${CONTECO_REALM}/modeco.base.${MODECO_NAME}"
 	executionplane-info "DESTINATION REPO: $modecoPath"
 
 	if [[ ! -d $modecoPath ]] ; then
@@ -32,33 +30,22 @@ deployPath=$1
 		executionplane-info "Initialised repository."
 	else
 		executionplane-info "Repository already exists at $modecoPath."
-		# update How To help section
-		for f in $defaultPath/docs/HOW-TO*
-		do
-			cat $f | envsubst > $modecoPath/docs/$(basename $f)
-			done;
-		executionplane-info "Update How To help section."
 	fi
 
 	# copy stack docker-compose.yml files
 	mkdir -p $modecoPath/modeco/stacks
-	if [[ -f $rootPath/conteco/docker-compose/docker-compose.yml ]] ; then
-		cat $rootPath/conteco/docker-compose/docker-compose.yml | envsubst '$CONTECO_REGISTRY,$CONTECO_REALM,$CONTECO_ECOSYSTEM' \
-			> $modecoPath/modeco/stacks/0.${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
-		sed -i -e "s/conteco_overlay/modeco_overlay/g" $modecoPath/modeco/stacks/0.${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template
-		executionplane-info "Copied docker-compose.yml to 0.${CONTECO_TYPE}.${CONTECO_NAME}.docker-compose.yml.template"
-	else
-		for f in $rootPath/conteco/docker-compose/*.docker-compose.yml;
-		do
-			filename=$(basename $f)
-			cat $f | envsubst '$CONTECO_REGISTRY,$CONTECO_REALM,$CONTECO_ECOSYSTEM' > $modecoPath/modeco/stacks/${filename}.template
-			sed -i -e "s/conteco_overlay/modeco_overlay/g" $modecoPath/modeco/stacks/${filename}.template
-			executionplane-info "Copied $filename to ${filename}.template"
-			done;
-	fi
+	for f in $rootPath/conteco/docker-compose/stacks/*;
+	do
+		filename=$(basename $f)
+		cat $f | envsubst '$CONTECO_REALM,$CONTECO_ECOSYSTEM' > $modecoPath/modeco/stacks/${filename}
+		executionplane-info "Copied $filename to ${filename}"
+		done;
 
-	# create / update settings.template
-	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings.template
-	sed -i -e "s/conteco_overlay/modeco_overlay/g" $modecoPath/modeco/settings.template
-	executionplane-info "Copied environment.module to settings.template"
+	# create / update settings.base
+	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings.base
+	executionplane-info "Copied environment.modeco to settings.base"
+	if [[ ! -d $modecoPath/modeco/settings ]] ; then
+		cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings
+		executionplane-info "Created initial settings"
+	fi
 )

@@ -26,10 +26,6 @@ environment_file="${environment_file}$(cat $tmpfile)
 
 "
 
-#environmentEntry=$(sed -n "/# START TOPLEVEL SETTINGS/,/# END TOPLEVEL SETTINGS/p" $deployPath/environment)
-#environment_file="${environment_file}${environmentEntry}
-#"
-
 intermediate=$(grep _VOLUMES_ $tmpfile | grep -v _GLOBAL | cut -d'"' -f 2 | tr '\n' '|')
 intermediate="${intermediate//|/: \{ \}, }"
 intermediate=$(echo $intermediate | sed 's/.$//')
