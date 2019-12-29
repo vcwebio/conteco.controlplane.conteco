@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 deployPath=$1
 if [[ "$CONTECO_TYPE" == "module" ]] ; then
-	IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKS}"
-	for stackNumber in ${!stacks[@]};
+	IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
+	for stackName in ${stackNames[@]};
 	do
-		stack=${stacks[stackNumber]}
-		destination="$deployPath/$stack.docker-compose.yml"
+		destination="$deployPath/stacks/$stackName.docker-compose.yml"
 		source="$destination.template"
 		cat $source | envsubst "$CONTECO_DC_GLOBAL" > $destination
 		done;
 else
 	export CONTECO_TYPE_DOT_NAME="${CONTECO_TYPE}.${CONTECO_NAME}"
-	templatePath="$deployPath/stacks/docker-compose.yml.template"
+	templatePath="$deployPath/stacks/${CONTECO_DC_GLOBAL_STACKNAMES}.docker-compose.yml.template"
 	if [ ! -f "$templatePath" ]; then
 		templatePath="/conteco/docker-compose/stacks/docker-compose.yml.template"
 	fi

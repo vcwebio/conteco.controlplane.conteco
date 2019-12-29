@@ -34,17 +34,18 @@ deployPath=$1
 
 	# copy stack docker-compose.yml files
 	mkdir -p $modecoPath/modeco/stacks
-	for f in $rootPath/conteco/docker-compose/stacks/*;
+	for f in $rootPath/conteco/docker-compose/stacks/*.yml;
 	do
 		filename=$(basename $f)
 		cat $f | envsubst '$CONTECO_REALM,$CONTECO_ECOSYSTEM' > $modecoPath/modeco/stacks/${filename}
-		executionplane-info "Copied $filename to ${filename}"
+		sed -i -e "s/conteco_overlay/modeco_overlay/g" $modecoPath/modeco/stacks/${filename}
+		executionplane-info "Copied $filename"
 		done;
 
 	# create / update settings.base
 	cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings.base
 	executionplane-info "Copied environment.modeco to settings.base"
-	if [[ ! -d $modecoPath/modeco/settings ]] ; then
+	if [[ ! -f $modecoPath/modeco/settings ]] ; then
 		cp $rootPath/conteco/docker-compose/environment.module $modecoPath/modeco/settings
 		executionplane-info "Created initial settings"
 	fi

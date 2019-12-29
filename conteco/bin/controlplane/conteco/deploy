@@ -12,7 +12,7 @@ if [[ "$1" == "for-each-node" ]] ; then
 	fi
 	if [[ $# -gt 1 ]] ; then
 		dockercompose=$1
-		stackNumber=$2
+		stackName=$2
 		rootPath="${CONTECO_PWD}/${BASH_ARGV[0]}"
 	else
 		rootPath="${CONTECO_PWD}/$1"
@@ -20,14 +20,12 @@ if [[ "$1" == "for-each-node" ]] ; then
 	deployPath="$rootPath/conteco/docker-compose"
 	. $deployPath/environment
 	if [[ "$dockercompose" == *"docker-compose.yml" ]] ; then
-		dockercompose="$deployPath/$dockercompose"
-	else
-		dockercompose="$deployPath/docker-compose.yml"
+		dockercompose="$deployPath/stacks/$dockercompose"
 	fi
 	if [[ "$CONTECO_TYPE" == "module" ]] ; then
-		stackName="${CONTECO_TYPE}_${CONTECO_NAME}_$stackNumber"
+		stackName="${CONTECO_NAME}_$stackName"
 	else
-		stackName="${CONTECO_TYPE}_${CONTECO_NAME}"
+		stackName="${CONTECO_DC_GLOBAL_STACKNAMES}"
 	fi
 	case $command in
 		repo)
@@ -46,12 +44,10 @@ if [[ "$1" == "for-each-node" ]] ; then
 					deploy-up $stackName $dockercompose
 				fi
 			else
-				moduleStacks="${CONTECO_DC_GLOBAL_STACKS}"
-				IFS=',' read -r -a stacks <<< "$moduleStacks"
-				for stackNumber in ${!stacks[@]};
+				IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
+				for stackName in ${stackNames[@]};
 				do
-					stack=${stacks[stackNumber]}
-					deploy $command "$stackNumber.$stack.docker-compose.yml" $stackNumber $@
+					deploy $command "$stackName.docker-compose.yml" $stackName $@
 					done;
 			fi
 			;;

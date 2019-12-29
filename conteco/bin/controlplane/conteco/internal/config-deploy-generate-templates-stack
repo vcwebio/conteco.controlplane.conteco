@@ -4,15 +4,18 @@ deployPath=$1
 (
 environment_template=$'#!/usr/bin/env bash\n\n'
 docker_compose_template=$'---\nversion: \'3\'\nservices:\n\n'
-IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKS}"
-for stack in ${stacks[@]};
+IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACK_STACKS}"
+IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACK_STACKNAMES}"
+for stackNumber in ${!stacks[@]};
 do
+	stack=${stacks[stackNumber]}
+	stackName=${stackNames[stackNumber]}
 	stackPath="${CONTECO_PWD}/${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.$stack/conteco/docker-compose"
 	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $stackPath/environment)
 	environment_template="${environment_template}${stackEnvironment}
 
 "
-	stackDockerCompose=$(sed -n "/# START SERVICE/,/# END SERVICE/p" $stackPath/docker-compose.yml)
+	stackDockerCompose=$(sed -n "/# START SERVICE/,/# END SERVICE/p" $stackPath/stacks/$stackName.docker-compose.yml)
 	docker_compose_template="${docker_compose_template}${stackDockerCompose}
 
 "
@@ -21,6 +24,12 @@ DOLLAR="$"
 docker_compose_template="${docker_compose_template}networks: {${DOLLAR}{CONTECO_DC_GLOBAL_NETWORKS}}
 volumes: {${DOLLAR}{CONTECO_DC_GLOBAL_VOLUMES}}
 "
+
 echo "$environment_template" > $deployPath/environment.template
-echo "$docker_compose_template" > $deployPath/docker-compose.yml.template
+sed -i -e "s/CONTECO_DC_/CONTECO_DC_${CONTECO_DC_GLOBAL_STACKNAMES^^}_/g" $deployPath/environment.template
+sed -i -e "s/CONTECO_DC_${CONTECO_DC_GLOBAL_STACKNAMES^^}_GLOBAL/CONTECO_DC_GLOBAL/g" $deployPath/environment.template
+
+echo "$docker_compose_template" > $deployPath/stacks/${CONTECO_DC_GLOBAL_STACKNAMES}.docker-compose.yml.template
+sed -i -e "s/CONTECO_DC_/CONTECO_DC_${CONTECO_DC_GLOBAL_STACKNAMES^^}_/g" $deployPath/stacks/${CONTECO_DC_GLOBAL_STACKNAMES}.docker-compose.yml.template
+sed -i -e "s/CONTECO_DC_${CONTECO_DC_GLOBAL_STACKNAMES^^}_GLOBAL/CONTECO_DC_GLOBAL/g" $deployPath/stacks/${CONTECO_DC_GLOBAL_STACKNAMES}.docker-compose.yml.template
 )

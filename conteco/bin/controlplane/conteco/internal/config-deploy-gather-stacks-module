@@ -4,16 +4,22 @@ deployPath=$1
 (
 DOLLAR="$"
 environment_template=$'#!/usr/bin/env bash\n\n'
-IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
-for stack in ${stacks[@]};
+IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKS}"
+IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
+IFS=',' read -r -a stackNamesPrevious <<< "${CONTECO_DC_GLOBAL_STACKNAMES_PREVIOUS}"
+for stackNumber in ${!stacks[@]};
 do
+	stack=${stacks[stackNumber]}
+	stackName=${stackNames[stackNumber]}
+	stackNamePrevious=${stackNamesPrevious[stackNumber]}
 	stackPath="${CONTECO_PWD}/${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.$stack/conteco/docker-compose"
-	destination="$deployPath/$stack.docker-compose.yml.template"
-	cp $stackPath/docker-compose.yml $destination
-#	sed -i -e "s/CONTECO_DC_/CONTECO_DC_${stackNumber}_/g" $destination
-#	sed -i -e "s/CONTECO_DC_${stackNumber}_GLOBAL/CONTECO_DC_GLOBAL/g" $destination
+	source="$stackPath/stacks/$stackNamePrevious.docker-compose.yml"
+	destination="$deployPath/stacks/$stackName.docker-compose.yml.template"
+	cp $source $destination
+	sed -i -e "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" $destination
+#	sed -i -e "s/CONTECO_DC_${stackName}_GLOBAL/CONTECO_DC_GLOBAL/g" $destination
 	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $stackPath/environment)
-#	stackEnvironment=${stackEnvironment//CONTECO_DC_/CONTECO_DC_${stackNumber}_}
+	stackEnvironment=${stackEnvironment//CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_}
 	environment_template="${environment_template}${stackEnvironment}
 "
 	done;

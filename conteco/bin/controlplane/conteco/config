@@ -24,9 +24,10 @@ if [[ "$1" == "for-each-node" ]] ; then
 			if [[ "$CONTECO_TYPE" != "external" ]] ; then
 				if [[ "$CONTECO_TYPE" == "stack" ]] ; then
 					config-deploy-generate-templates-stack $deployPath
-					config-deploy-generate-environment-stack $deployPath
 				elif [[ "$CONTECO_TYPE" == "module" ]] ; then
 					config-deploy-gather-stacks-module $deployPath
+				fi
+				if [[ " stack module " ==  *"$CONTECO_TYPE"* ]] ; then
 					config-deploy-generate-environment-stack $deployPath
 				fi
 				config-deploy-generate-docker-compose-yml $deployPath
