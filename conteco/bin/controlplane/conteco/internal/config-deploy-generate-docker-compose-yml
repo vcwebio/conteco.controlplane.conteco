@@ -17,7 +17,7 @@ else
 	token=$(echo "$CONTECO_DC_GLOBAL_STACKNAMES" | tr - _)
 	tmpfile=$(mktemp /tmp/docker-compose.yml.template.XXXXXX)
 	destination=$deployPath/stacks/${token}.docker-compose.yml
-	cat $templatePath | envsubst '$CONTECO_TYPE_DOT_NAME'	> $tmpfile
+	cat $templatePath | envsubst '$CONTECO_ECOSYSTEM,$CONTECO_TYPE_DOT_NAME'	> $tmpfile
 	sed -i -e "s/CONTECO_DC_SERVICE_/CONTECO_DC_${token^^}_/g" $tmpfile
 	cat $tmpfile | envsubst "$CONTECO_DC_GLOBAL"	> $destination
 	rm $tmpfile
