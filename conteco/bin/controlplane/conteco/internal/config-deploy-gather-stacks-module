@@ -3,7 +3,9 @@ deployPath=$1
 
 (
 DOLLAR="$"
-environment_template=$'#!/usr/bin/env bash\n\n'
+mkdir $deployPath/import
+chmod -R 777 $deployPath/import
+echo $'#!/usr/bin/env bash\n' > $deployPath/environment.template
 IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKS}"
 IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
 IFS=',' read -r -a stackNamesPrevious <<< "${CONTECO_DC_GLOBAL_STACKNAMES_PREVIOUS}"
@@ -12,16 +14,27 @@ do
 	stack=${stacks[stackNumber]}
 	stackName=${stackNames[stackNumber]}
 	stackNamePrevious=${stackNamesPrevious[stackNumber]}
-	stackPath="${CONTECO_PWD}/${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.$stack/conteco/docker-compose"
-	source="$stackPath/stacks/$stackNamePrevious.docker-compose.yml"
+	imageName="${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.$stack"
+	. executionplane-capture-output docker create $imageName
+	executionplane docker container cp $CONTECO_EXECUTIONPLANE_OUTPUT:/conteco/docker-compose/. $deployPath/import
+	chmod -R 777 $deployPath/import
+	source="$deployPath/import/stacks/$stackNamePrevious.docker-compose.yml"
+	chmod 777 $source
 	destination="$deployPath/stacks/$stackName.docker-compose.yml.template"
 	cp $source $destination
-	sed -i -e "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" $destination
-#	sed -i -e "s/CONTECO_DC_${stackName}_GLOBAL/CONTECO_DC_GLOBAL/g" $destination
-	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $stackPath/environment)
-	stackEnvironment=${stackEnvironment//CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_}
-	environment_template="${environment_template}${stackEnvironment}
-"
-	done;
-echo "$environment_template" > $deployPath/environment.template
+	chmod 777 $destination
+	if [[ "${stackNamePrevious^^}" != "${stackName^^}" ]] ; then
+		sed -i -e "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" $destination
+	fi
+	echo "$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $deployPath/import/environment)" >> $deployPath/environment.template
+	if [[ "${stackNamePrevious^^}" != "${stackName^^}" ]] ; then
+		sed -i -e "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" $deployPath/environment.template
+	fi
+#	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $deployPath/import/environment)
+#	echo "$stackEnvironment" | sed "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" >> $deployPath/environment.template
+#	echo "${stackEnvironment//CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_}" >> $deployPath/environment.template
+	rm -rf $deployPath/import/*
+done;
+rm -rf $deployPath/import
+#echo "$environment_template" > $deployPath/environment.template
 )

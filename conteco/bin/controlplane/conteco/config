@@ -22,6 +22,7 @@ if [[ "$1" == "for-each-node" ]] ; then
 			;;
 		deploy)
 			if [[ "$CONTECO_TYPE" != "external" ]] ; then
+				executionplane rm $deployPath/stacks/*
 				if [[ "$CONTECO_TYPE" == "stack" ]] ; then
 					config-deploy-generate-templates-stack $deployPath
 				elif [[ "$CONTECO_TYPE" == "module" ]] ; then
