@@ -23,7 +23,7 @@ if [[ "$1" == "for-each-node" ]] ; then
 		dockercompose="$deployPath/stacks/$dockercompose"
 	fi
 	if [[ "$CONTECO_TYPE" == "module" ]] ; then
-		stackName="${CONTECO_NAME}_$stackName"
+		stackName="${CONTECO_NAME}_conteco_dc_$stackName"
 	else
 		stackName="${CONTECO_DC_GLOBAL_STACKNAMES}"
 	fi

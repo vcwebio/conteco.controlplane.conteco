@@ -25,10 +25,12 @@ do
 	chmod 777 $destination
 	if [[ "${stackNamePrevious^^}" != "${stackName^^}" ]] ; then
 		sed -i -e "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" $destination
+		sed -i -e "s/conteco_dc_${stackNamePrevious}/conteco_dc_${stackName}/g" $destination
 	fi
 	echo "$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $deployPath/import/environment)" >> $deployPath/environment.template
 	if [[ "${stackNamePrevious^^}" != "${stackName^^}" ]] ; then
 		sed -i -e "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" $deployPath/environment.template
+		sed -i -e "s/conteco_dc_${stackNamePrevious}/conteco_dc_${stackName}/g" $deployPath/environment.template
 	fi
 #	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $deployPath/import/environment)
 #	echo "$stackEnvironment" | sed "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" >> $deployPath/environment.template
