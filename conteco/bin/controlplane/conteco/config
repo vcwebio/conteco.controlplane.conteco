@@ -18,7 +18,7 @@ if [[ "$1" == "for-each-node" ]] ; then
 	imageName="${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.${CONTECO_TYPE}.${CONTECO_NAME}"
 	case $command in
 		build)
-			.base config $@
+			.base config for-each-node $@
 			;;
 		deploy)
 			if [[ "$CONTECO_TYPE" != "external" ]] ; then
@@ -36,16 +36,16 @@ if [[ "$1" == "for-each-node" ]] ; then
 			fi
 			;;
 		increment)
-			.base config $@
+			.base config for-each-node $@
 			;;
 		remove-crs)
-			.base config $@
+			.base config for-each-node $@
 			;;
 		set-version)
-			.base config $@
+			.base config for-each-node $@
 			;;
 		*)
-			executionplane-error "Method not recognised: $1."
+			executionplane-error "Method not recognised: $command."
 			;;
 	esac
     executionplane-complete

@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
-if [[ "$1" == "for-each-node" ]] ; then
 (
-	shift
-    . executionplane-invoke "$0 $@"
+  export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+  . executionplane-invoke "$0 $@"
 	.base release $@
-    executionplane-complete
+  executionplane-complete
 )
-else
-    export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
-	for-each $(basename $0) $@
-fi
