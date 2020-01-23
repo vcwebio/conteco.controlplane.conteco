@@ -1,5 +1,7 @@
 #
 # config [arguments] <selector>
+# Use the --info flag to get config specific container image information.
+#
 # The config method implements various options:
 #
 # config build
@@ -7,7 +9,8 @@
 # Dockerfile.static allows the image to be build with a simple docker build.
 #
 # config deploy
-# This method configures the service stack(s) so that they are ready for deployment.
+# Generates the docker-compose.yml and environemnt file from template and initial environment settings.
+# The routine differs for single images, stacks and modules.
 #
 # config increment [revision/minor/major]
 # The increment option increments the version number of the format vx.y.z

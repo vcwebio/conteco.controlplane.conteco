@@ -32,11 +32,7 @@ do
 		sed -i -e "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" $deployPath/environment.template
 		sed -i -e "s/conteco_dc_${stackNamePrevious}/conteco_dc_${stackName}/g" $deployPath/environment.template
 	fi
-#	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $deployPath/import/environment)
-#	echo "$stackEnvironment" | sed "s/CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_/g" >> $deployPath/environment.template
-#	echo "${stackEnvironment//CONTECO_DC_${stackNamePrevious^^}_/CONTECO_DC_${stackName^^}_}" >> $deployPath/environment.template
 	rm -rf $deployPath/import/*
 done;
 rm -rf $deployPath/import
-#echo "$environment_template" > $deployPath/environment.template
 )

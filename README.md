@@ -1,6 +1,6 @@
 # conteco.controlplane.conteco
 
-The `controlplane.base` image of the __ContEco__ container ecosystem.
+The `controlplane.conteco` image of the __ContEco__ container ecosystem.
 See `conteco.docs.overview` for more information on the ContEco ecosystem.
 
 The `controlplane.conteco` image implements the controlplane for the ContEco ecosystem and is concerned with container image configuration.  
@@ -40,7 +40,7 @@ Inherited in full from `controlplane.base`.
 
 * __deploy__
 Deploy API - of container images, modules or solutions.
-Full implementation - [config API in detail](./docs/CONTROLPLANE-API-DEPLOY.md)
+Full implementation - [deploy API in detail](./docs/CONTROLPLANE-API-DEPLOY.md)
 
 * __run__
 Run API - of modules or solutions.
