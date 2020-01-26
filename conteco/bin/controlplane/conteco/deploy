@@ -1,53 +1,54 @@
 #!/usr/bin/env bash
-if [[ "$1" == "for-each-node" ]] ; then
 (
-	shift
-  . executionplane-invoke "$0 $@"
-	imageName="${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.${CONTECO_TYPE}.${CONTECO_NAME}"
-	if [[ $# -gt 1 ]] ; then
-		command=$1
-		shift
-	else
-		command="up"
-	fi
-	if [[ $# -gt 1 ]] ; then
-		dockercompose=$1
-		stackName=$2
-		rootPath="/conteco/pwd/${BASH_ARGV[0]}"
-	else
-		rootPath="/conteco/pwd/$1"
-	fi
-	deployPath="$rootPath/conteco/docker-compose"
-	. $deployPath/environment
-	if [[ "$dockercompose" == *"docker-compose.yml" ]] ; then
-		dockercompose="$deployPath/stacks/$dockercompose"
-	fi
-	if [[ "$CONTECO_TYPE" == "module" ]] ; then
-		stackName="${CONTECO_NAME}_conteco_dc_$stackName"
-	else
-		stackName="${CONTECO_DC_GLOBAL_STACKNAMES}"
-	fi
-	if [[ -f $dockercompose ]] ; then
-		if [[ "$command" == "down" ]] ; then
-			executionplane docker stack remove  "$stackName"
-			executionplane docker network rm  "${CONTECO_TYPE}_overlay"
-		elif [[ "$command" == "downup" ]] ; then
-			executionplane docker stack remove  "$stackName"
-			deploy-up $stackName $dockercompose
-		elif [[ "$command" == "up" ]] ; then
-			executionplane docker network create -d overlay  "${CONTECO_TYPE}_overlay"
-			deploy-up $stackName $dockercompose
-		fi
-	else
-		IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
-		for stackName in ${stackNames[@]};
-		do
-			deploy $command "$stackName.docker-compose.yml" $stackName $@
-			done;
-	fi
+	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	rootPath="/conteco/pwd/${imageName}"
+	. $rootPath/environment
+
+	case $1 in
+		--info)
+			.base deploy $@
+		;;
+		*)
+			if [[ $# -gt 1 ]] ; then
+				command=$1
+			else
+				command="up"
+			fi
+			if $# -gt 2 ]] ; then
+				dockercompose=$2
+				stackName=$3
+			fi
+			deployPath="$rootPath/conteco/docker-compose"
+			. $deployPath/environment
+			if [[ "$dockercompose" == *"docker-compose.yml" ]] ; then
+				dockercompose="$deployPath/stacks/$dockercompose"
+			fi
+			if [[ "$CONTECO_TYPE" == "module" ]] ; then
+				stackName="${CONTECO_NAME}_conteco_dc_$stackName"
+			else
+				stackName="${CONTECO_DC_GLOBAL_STACKNAMES}"
+			fi
+			if [[ -f $dockercompose ]] ; then
+				if [[ "$command" == "down" ]] ; then
+					executionplane docker stack remove  "$stackName"
+					executionplane docker network rm  "${CONTECO_TYPE}_overlay"
+				elif [[ "$command" == "downup" ]] ; then
+					executionplane docker stack remove  "$stackName"
+					deploy-up $stackName $dockercompose
+				elif [[ "$command" == "up" ]] ; then
+					executionplane docker network create -d overlay  "${CONTECO_TYPE}_overlay"
+					deploy-up $stackName $dockercompose
+				fi
+			else
+				IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
+				for stackName in ${stackNames[@]};
+				do
+					deploy $command "$stackName.docker-compose.yml" $stackName $@
+					done;
+			fi
+		;;
+	esac
 	executionplane-complete
 )
-else
-  export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
-	for-each $(basename $0) $@
-fi

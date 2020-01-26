@@ -27,7 +27,7 @@ Inherited in full from `controlplane.base`.
 
 * __config__  
 API section dealing with repository configuration.  
-Inherits implementation from `controlplane.base` and adding further methods.
+Inherits implementation from `controlplane.base` and adding further methods.  
 Full implementation - [config API in detail](./docs/CONTROLPLANE-API-CONFIG.md)
 
 * __build__
@@ -39,7 +39,7 @@ Release API - container images only.
 Inherited in full from `controlplane.base`.
 
 * __deploy__
-Deploy API - of container images, modules or solutions.
+Deploy API - of container images, modules or solutions.  
 Full implementation - [deploy API in detail](./docs/CONTROLPLANE-API-DEPLOY.md)
 
 * __run__

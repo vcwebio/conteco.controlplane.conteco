@@ -1,26 +1,17 @@
 #!/usr/bin/env bash
-if [[ "$1" == "for-each-node" ]] ; then
 (
-	shift
-    . executionplane-invoke "$0 $@"
-	if [[ $# -gt 1 ]] ; then
-		rootPath="/conteco/pwd/${BASH_ARGV[0]}"
-	else
-		rootPath="/conteco/pwd/$1"
-	fi
-	command=$1
-	if [[ " deploy stack module " == *"$command"* ]] ; then
-		deployPath="$rootPath/conteco/docker-compose"
-		if [[ -f $deployPath/environment ]] ; then
-			. $deployPath/environment
-		fi
-	fi
-	imageName="${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.${CONTECO_TYPE}.${CONTECO_NAME}"
-	case $command in
-		build)
-			.base config for-each-node $@
-			;;
+	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	rootPath="/conteco/pwd/${imageName}"
+	. $rootPath/environment
+
+	case $1 in
 		deploy)
+			deployPath="$rootPath/conteco/docker-compose"
+			if [[ -f $deployPath/environment ]] ; then
+				. $deployPath/environment
+			fi
 			if [[ "$CONTECO_TYPE" != "external" ]] ; then
 				executionplane rm $deployPath/stacks/*
 				if [[ "$CONTECO_TYPE" == "stack" ]] ; then
@@ -34,23 +25,10 @@ if [[ "$1" == "for-each-node" ]] ; then
 				config-deploy-generate-docker-compose-yml $deployPath
 				config-deploy-generate-environment-module $deployPath
 			fi
-			;;
-		increment)
-			.base config for-each-node $@
-			;;
-		remove-crs)
-			.base config for-each-node $@
-			;;
-		set-version)
-			.base config for-each-node $@
-			;;
+		;;
 		*)
-			executionplane-error "Method not recognised: $command."
-			;;
+			.base config $@
+		;;
 	esac
-    executionplane-complete
+  executionplane-complete
 )
-else
-    export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
-	for-each $(basename $0) $@
-fi

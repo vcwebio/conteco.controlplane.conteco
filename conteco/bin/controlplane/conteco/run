@@ -2,8 +2,6 @@
 (
   export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
   . executionplane-invoke "$0 $@"
-	command=$1
-	shift
-	executionplane-error "Method not implemented: ${CONTECO_NAME} $(command $0)."
+  .base run $@
   executionplane-complete
 )
