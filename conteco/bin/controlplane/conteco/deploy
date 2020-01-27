@@ -16,7 +16,7 @@
 			else
 				command="up"
 			fi
-			if $# -gt 2 ]] ; then
+			if [[ $# -gt 2 ]] ; then
 				dockercompose=$2
 				stackName=$3
 			fi
