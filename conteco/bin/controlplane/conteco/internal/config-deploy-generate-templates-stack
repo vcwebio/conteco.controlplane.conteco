@@ -10,7 +10,7 @@ for stackNumber in ${!stacks[@]};
 do
 	stack=${stacks[stackNumber]}
 	stackName=${stackNames[stackNumber]}
-	stackPath="/conteco/pwd/${CONTECO_REALM}/${CONTECO_ECOSYSTEM}.$stack/conteco/docker-compose"
+	stackPath="/conteco/pwd/${CONTECO_REALM_RUNTIME}/${CONTECO_ECOSYSTEM_RUNTIME}.$stack/conteco/docker-compose"
 	stackEnvironment=$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $stackPath/environment)
 	environment_template="${environment_template}${stackEnvironment}
 
