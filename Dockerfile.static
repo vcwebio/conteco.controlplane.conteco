@@ -13,14 +13,14 @@ COPY ./ /conteco/repo/
 
 ##### BEGIN image/Dockerfile/env-labels-footer #####
 ENV CONTECO_NAME="conteco" \
-    CONTECO_TAG="v1.2.2" \
+    CONTECO_TAG="v1.2.3" \
     CONTECO_BASE="controlplane.base" \
     CONTECO_BUILD="image"
 LABEL io.vcweb.name="conteco" \
-      io.vcweb.tag="v1.2.2" \
+      io.vcweb.tag="v1.2.3" \
       io.vcweb.base="controlplane.base" \
       io.vcweb.build="image" \
-      io.vcweb.label="Conteco controlplane conteco" \
+      io.vcweb.label="controlplane.conteco - Conteco" \
       io.vcweb.description="The Conteco controlplane conteco image." \
       io.vcweb.docker.cmd.help="docker run vcwebio/conteco.controlplane.conteco --help" 
 ##### END image/Dockerfile/env-labels-footer #####
