@@ -2,6 +2,10 @@
 stackName=$1
 composefile=$2
 
+export CONTECO_STACKPREFIX="conteco"
+export CONTECO_NETWORKLOCAL="conteco"
+export CONTECO_NETWORKGLOBAL="conteco"
+
 tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
 arguments="-c $tmpfile $stackName"
 (
