@@ -18,7 +18,7 @@ do
 	importFolder="$deployPath/import"
 
 #	extract-resource $imageName conteco/docker-compose/. $importFolder
-	. executionplane-capture-output docker create $imageName
+	. executionplane-capture-output docker create "${CONTECO_REGISTRTY}$imageName"
 	executionplane docker container cp $CONTECO_EXECUTIONPLANE_OUTPUT:/conteco/docker-compose/. $importFolder
 
 	chmod -R 777 $importFolder
