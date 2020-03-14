@@ -6,6 +6,10 @@
 	rootPath="/conteco/pwd/${imageName}"
 	. $rootPath/environment
 
+	export CONTECO_STACKPREFIX="conteco_dc"
+	export CONTECO_NETWORKLOCAL="conteco_dc"
+	export CONTECO_NETWORKGLOBAL="conteco_dc"
+
 	case $1 in
 		--info)
 			.base deploy $@
@@ -31,14 +35,19 @@
 				stackName="${CONTECO_DC_GLOBAL_STACKNAMES}"
 			fi
 			if [[ -f $dockercompose ]] ; then
-				if [[ "$command" == "down" ]] ; then
+				if [[ "$command" == "down"* ]] ; then
 					executionplane docker stack remove  "$stackName"
-					executionplane docker network rm  "${CONTECO_TYPE}_overlay"
-				elif [[ "$command" == "downup" ]] ; then
-					executionplane docker stack remove  "$stackName"
-					deploy-up $stackName $dockercompose
-				elif [[ "$command" == "up" ]] ; then
-					executionplane docker network create -d overlay  "${CONTECO_TYPE}_overlay"
+					sleep 1
+					executionplane docker network rm  "${CONTECO_NETWORKLOCAL}_overlay"
+					sleep 1
+					executionplane docker container prune --force
+					sleep 1
+					executionplane docker volume rm $(echo "$CONTECO_DC_GLOBAL_VOLUME_LIST" | envsubst)
+				fi
+				if [[ "$command" == *"up" ]] ; then
+					executionplane docker volume rm $(echo "$CONTECO_DC_GLOBAL_VOLUME_LIST" | envsubst)
+					executionplane docker network create -d overlay  "${CONTECO_NETWORKLOCAL}_overlay"
+					executionplane docker volume create $(echo "$CONTECO_DC_GLOBAL_VOLUME_LIST" | envsubst)
 					deploy-up $stackName $dockercompose
 				fi
 			else
