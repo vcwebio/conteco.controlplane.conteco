@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+stackName=$1
+
+executionplane docker stack remove  "$stackName"
+executionplane docker network rm  "${CONTECO_NETWORKLOCAL}_overlay"
+executionplane docker network rm  "${CONTECO_NETWORKGLOBAL}_overlay"
+executionplane docker container prune --force
+if [[ "$CONTECO_DC_GLOBAL_VOLUME_LIST" != "" ]] ; then
+	IFS=',' read -r -a volumes <<< "${CONTECO_DC_GLOBAL_VOLUME_LIST}"
+	for volume in ${volumes[@]};
+	do
+		volumeName="$(echo "$volume" | envsubst)"
+		continue="true"
+		while [[ "true" == "$continue" ]] ;
+		do
+			executionplane docker volume rm "$volumeName"
+			result=$(docker volume ls | grep "$volumeName")
+			if [[ "$result" == "" ]] ; then
+				continue="false"
+			else
+				sleep 3;
+			fi
+		done;
+	done;
+fi
