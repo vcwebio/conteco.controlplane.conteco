@@ -7,6 +7,10 @@
 	. $rootPath/environment
 
 	case $1 in
+		all)
+			config build $@
+			config deploy $@
+		;;
 		deploy)
 			deployPath="$rootPath/conteco/docker-compose"
 			if [[ -f $deployPath/environment ]] ; then

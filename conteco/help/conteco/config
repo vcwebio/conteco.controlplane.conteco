@@ -4,6 +4,9 @@
 #
 # The config method implements various options:
 #
+# config all
+# Consists of config build and config deploy
+#
 # config build
 # The build option regenerates the Dockerfile.static from the environment settings.
 # Dockerfile.static allows the image to be build with a simple docker build.
