@@ -4,7 +4,7 @@
 	. executionplane-invoke "$0 $@"
 	imageName="${@: -1}"
 	rootPath="/conteco/pwd/${imageName}"
-	. $rootPath/environment
+	. invoke-script $imageName environment
 
 	export CONTECO_URLPREFIX="conteco_dc"
 	export CONTECO_STACKPREFIX="conteco_dc"
