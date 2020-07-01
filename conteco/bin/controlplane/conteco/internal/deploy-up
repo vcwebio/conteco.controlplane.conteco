@@ -10,6 +10,7 @@ if [[ "$CONTECO_DC_GLOBAL_VOLUME_LIST" != "" ]] ; then
 		executionplane docker volume create $(echo "$volume" | envsubst)
 	done;
 fi
+ 
 tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
 arguments="-c $tmpfile $stackName"
 (
