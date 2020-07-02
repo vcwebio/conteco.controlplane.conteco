@@ -9,7 +9,7 @@
 	case $1 in
 		all)
 			config build $@
-			config deploy $@
+			if [[  " backup external " != *"$CONTECO_TYPE"* ]] ; then config deploy $@ ; fi
 		;;
 		deploy)
 			deployPath="$rootPath/conteco/docker-compose"
