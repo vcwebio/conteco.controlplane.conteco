@@ -26,7 +26,7 @@
 				stackName=$3
 			fi
 			deployPath="$rootPath/conteco/docker-compose"
-			. $deployPath/environment
+			. $deployPath/environment.module
 			if [[ "$dockercompose" == *"docker-compose.yml" ]] ; then
 				dockercompose="$deployPath/stacks/$dockercompose"
 			fi
