@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+stackName=$1
+composefile=$2
+executionplane docker network create -d overlay  "${CONTECO_NETWORKLOCAL}_overlay"
+executionplane docker network create -d overlay  "${CONTECO_NETWORKGLOBAL}_overlay"
+if [[ "$CONTECO_DC_GLOBAL_VOLUME_LIST" != "" ]] ; then
+	IFS=',' read -r -a volumes <<< "${CONTECO_DC_GLOBAL_VOLUME_LIST}"
+	for volume in ${volumes[@]};
+	do
+		executionplane docker volume create $(echo "$volume" | envsubst)
+	done;
+fi
+
+tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
+arguments="-c $tmpfile $stackName"
+(
+	cat $composefile | envsubst > $tmpfile
+	cat $tmpfile
+)
+executionplane docker stack deploy $arguments
+rm $tmpfile

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+deployPath=$1
+
+(
+DOLLAR="$"
+mkdir $deployPath/import
+chmod -R 777 $deployPath/import
+echo $'#!/usr/bin/env bash\n' > $deployPath/environment.template
+IFS=',' read -r -a stacks <<< "${CONTECO_DC_GLOBAL_STACKS}"
+IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
+IFS=',' read -r -a stackNamesPrevious <<< "${CONTECO_DC_GLOBAL_STACKNAMES_PREVIOUS}"
+for stackNumber in ${!stacks[@]};
+do
+	stack=${stacks[stackNumber]}
+	stackName=${stackNames[stackNumber]}
+	stackNamePrevious=${stackNamesPrevious[stackNumber]}
+	imageName="${CONTECO_REALM_RUNTIME}/${CONTECO_ECOSYSTEM_RUNTIME}.$stack"
+	importFolder="$deployPath/import"
+
+#	extract-resource $imageName conteco/docker-compose/. $importFolder
+	. executionplane-capture-output docker create "${CONTECO_REGISTRY}$imageName"
+	executionplane docker container cp $CONTECO_EXECUTIONPLANE_OUTPUT:/conteco/docker-compose/. $importFolder
+
+	chmod -R 777 $importFolder
+	source="$importFolder/stacks/$stackNamePrevious.docker-compose.yml"
+	chmod 777 $source
+	destination="$deployPath/stacks/$stackName.docker-compose.yml.template"
+	cp $source $destination
+	chmod 777 $destination
+	if [[ "${stackNamePrevious^^}" != "${stackName^^}" ]] ; then
+		sed -i -e "s/${stackNamePrevious^^}_/${stackName^^}_/g" $destination
+		sed -i -e "s/${stackNamePrevious}/${stackName}/g" $destination
+	fi
+	echo "$(sed -n "/# START SETTINGS/,/# END SETTINGS/p" $importFolder/environment)" >> $deployPath/environment.template
+	if [[ "${stackNamePrevious^^}" != "${stackName^^}" ]] ; then
+		sed -i -e "s/${stackNamePrevious^^}_/${stackName^^}_/g" $deployPath/environment.template
+		sed -i -e "s/${stackNamePrevious}/${stackName}/g" $deployPath/environment.template
+	fi
+	rm -rf $importFolder/*
+done;
+rm -rf $importFolder
+)

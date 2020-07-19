@@ -1,0 +1,9 @@
+#
+# deploy [arguments] <selector>
+# Use the --info flag to get config specific container image information.
+#
+# This interface manages the deployment of the service stacks (all types) and the repository (module type only).
+#
+# deploy [up/downup/down]
+# This method deploys, redeploys and removes the service stack(s).
+#

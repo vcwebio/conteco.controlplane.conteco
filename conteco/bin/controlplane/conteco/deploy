@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+(
+	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	rootPath="/conteco/pwd/${imageName}"
+	. invoke-script $imageName environment
+
+	export CONTECO_URLPREFIX="conteco_dc"
+	export CONTECO_STACKPREFIX="conteco_dc"
+	export CONTECO_NETWORKLOCAL="conteco_dc"
+	export CONTECO_NETWORKGLOBAL="conteco_dc_global"
+
+	case $1 in
+		--info)
+			.base deploy $@
+		;;
+		*)
+			if [[ $# -gt 1 ]] ; then
+				command=$1
+			else
+				command="up"
+			fi
+			if [[ $# -gt 2 ]] ; then
+				dockercompose=$2
+				stackName=$3
+			fi
+			deployPath="$rootPath/conteco/docker-compose"
+			. $deployPath/environment.module
+			if [[ "$dockercompose" == *"docker-compose.yml" ]] ; then
+				dockercompose="$deployPath/stacks/$dockercompose"
+			fi
+			if [[ " module stack " == *"$CONTECO_TYPE"* ]] ; then
+				export CONTECO_STACKPREFIX="conteco_dc_$CONTECO_NAME"
+			else
+				stackName="${CONTECO_DC_GLOBAL_STACKNAMES}"
+			fi
+			if [[ -f $dockercompose ]] ; then
+				if [[ "$command" == "down"* ]] ; then
+					deploy-down $stackName
+				fi
+				if [[ "$command" == *"up" ]] ; then
+					deploy-up $stackName $dockercompose
+				fi
+			else
+				IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
+				for stackName in ${stackNames[@]};
+				do
+					deploy $command "$stackName.docker-compose.yml" $stackName $@
+				done;
+			fi
+		;;
+	esac
+	executionplane-complete
+)

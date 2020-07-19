@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+(
+  export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+  . executionplane-invoke "$0 $@"
+	.base repo $@
+  executionplane-complete
+)

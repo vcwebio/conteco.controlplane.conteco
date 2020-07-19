@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+(
+	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_CONTECO"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	rootPath="/conteco/pwd/${imageName}"
+	. invoke-script $imageName environment
+
+	case $1 in
+		all)
+			config build $@
+			if [[  " backup external " != *"$CONTECO_TYPE"* ]] ; then config deploy $@ ; fi
+		;;
+		deploy)
+			deployPath="$rootPath/conteco/docker-compose"
+			if [[ -f $deployPath/environment ]] ; then
+				. $deployPath/environment
+			fi
+			if [[ "$CONTECO_TYPE" != "external" ]] ; then
+				executionplane rm $deployPath/stacks/*.yml
+				if [[ "$CONTECO_TYPE" == "stack" ]] ; then
+					config-deploy-generate-templates-stack $deployPath
+				elif [[ "$CONTECO_TYPE" == "module" ]] ; then
+					config-deploy-gather-stacks-module $deployPath
+				fi
+				if [[ " stack module " ==  *"$CONTECO_TYPE"* ]] ; then
+					config-deploy-generate-environment-stack $deployPath
+				fi
+				config-deploy-generate-docker-compose-yml $deployPath
+				config-deploy-generate-environment-module $deployPath
+			fi
+		;;
+		*)
+			.base config $@
+		;;
+	esac
+  executionplane-complete
+)
