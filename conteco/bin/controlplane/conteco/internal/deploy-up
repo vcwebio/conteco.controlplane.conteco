@@ -14,6 +14,7 @@ fi
 tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
 arguments="-c $tmpfile $stackName"
 (
+
 	cat $composefile | envsubst > $tmpfile
 	cat $tmpfile
 )
