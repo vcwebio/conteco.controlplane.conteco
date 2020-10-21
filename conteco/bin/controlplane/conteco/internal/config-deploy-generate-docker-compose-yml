@@ -19,6 +19,11 @@ else
 	destination=$deployPath/stacks/${token}.docker-compose.yml
 	cat $templatePath | envsubst '$CONTECO_ECOSYSTEM_RUNTIME,$CONTECO_TYPE_DOT_NAME'	> $tmpfile
 	sed -i -e "s/CONTECO_DC_SERVICE_/${token^^}_/g" $tmpfile
-	cat $tmpfile | envsubst "$CONTECO_DC_GLOBAL"	> $destination
+	if [[ "$CONTECO_EXTERNAL_IMAGE_NAME" == "" ]] ; then
+		export CONTECO_DC_GLOBAL_FULLY_QUALIFIED_IMAGE_NAME='${CONTECO_REALM_RUNTIME}/${CONTECO_ECOSYSTEM_RUNTIME}.${CONTECO_DC_GLOBAL_IMAGE_NAME}'
+	else
+		export CONTECO_DC_GLOBAL_FULLY_QUALIFIED_IMAGE_NAME="${CONTECO_DC_GLOBAL_IMAGE_NAME}"
+	fi
+	cat $tmpfile | envsubst '$CONTECO_DC_GLOBAL_FULLY_QUALIFIED_IMAGE_NAME' | envsubst "$CONTECO_DC_GLOBAL"	> $destination
 	rm $tmpfile
 fi
