@@ -15,7 +15,7 @@ if [[ "$CONTECO_DC_GLOBAL_VOLUME_LIST" != "" ]] ; then
 		do
 			executionplane docker volume rm "$volumeName"
 			result=$(docker volume ls | grep "$volumeName")
-			if [[ "$result" == "" ]] ; then
+			if [[ "$result" != "Error response from daemon:"* ]] ; then
 				continue="false"
 			else
 				sleep 3;

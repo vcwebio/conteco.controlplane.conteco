@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 stackName=$1
 composefile=$2
+imageName=$3
 executionplane docker network create -d overlay  "${CONTECO_NETWORKLOCAL}_overlay"
 executionplane docker network create -d overlay  "${CONTECO_NETWORKGLOBAL}_overlay"
 if [[ "$CONTECO_DC_GLOBAL_VOLUME_LIST" != "" ]] ; then
@@ -10,6 +11,14 @@ if [[ "$CONTECO_DC_GLOBAL_VOLUME_LIST" != "" ]] ; then
 		executionplane docker volume create $(echo "$volume" | envsubst)
 	done;
 fi
+
+IFS=',' read -r -a volumes <<< "${CONTECO_DC_GLOBAL_VOLUME_INITIALISED}"
+for volumeSettings in ${volumes[@]};
+do
+	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
+	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
+	executionplane --silent docker run -v ${volumeName}:${volumeDir} ${CONTECO_REGISTRY}$imageName cp -r /conteco/docker-compose/volumes/${volumeName:11}/* ${volumeDir}
+done;
 
 tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
 arguments="-c $tmpfile $stackName"

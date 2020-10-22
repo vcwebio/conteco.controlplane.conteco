@@ -40,7 +40,7 @@
 					deploy-down $stackName
 				fi
 				if [[ "$command" == *"up" ]] ; then
-					deploy-up $stackName $dockercompose
+					deploy-up $stackName $dockercompose $imageName
 				fi
 			else
 				IFS=',' read -r -a stackNames <<< "${CONTECO_DC_GLOBAL_STACKNAMES}"
